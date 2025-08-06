@@ -10,70 +10,80 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const MonsterArenaScreen = () => {
-  // Sample data based on your table - you can expand this
+const MonsterArenaScreen = ({ navigation }) => {
+  // Sample data 
   const [areasData, setAreasData] = useState([
     {
       id: 1,
       zona: "Besaid",
-      objetivo: "99 Pócimas de Salud",
+      objetivoZona: "99 Pócimas de Salud", // Area completion reward from Monster Arena NPC
       monsters: [
         {
           name: "Condor",
           required: 10,
           captured: 0,
-          completed: false
+          completed: false,
+          bribeAmount: "1,900 Gil", // Amount to pay for bribe
+          bribeItem: "3 Bombas de Humo" // Item received when bribe succeeds
         },
         {
           name: "Dingo",
           required: 10,
           captured: 0,
-          completed: false
+          completed: false,
+          bribeAmount: "2,500 Gil",
+          bribeItem: "4 Polvos Somníferos"
         },
         {
           name: "Flan de Agua",
           required: 10,
           captured: 0,
-          completed: false
+          completed: false,
+          bribeAmount: "6,300 Gil",
+          bribeItem: "2 Piedras Agua"
         }
       ],
-      soborno: "1,900 Gil",
-      objetoSoborno: "3 Bombas de Humo",
       areaCompleted: false,
       expanded: true // Start expanded for demo
     },
     {
       id: 2,
       zona: "Kilika",
-      objetivo: "99 Antídotos",
+      objetivoZona: "99 Antídotos", // Area completion reward
       monsters: [
         {
           name: "Dinonix",
           required: 10,
           captured: 0,
-          completed: false
+          completed: false,
+          bribeAmount: "3,200 Gil",
+          bribeItem: "2 Garra de Poder"
         },
         {
           name: "Killer Bee",
           required: 10,
           captured: 0,
-          completed: false
+          completed: false,
+          bribeAmount: "2,200 Gil",
+          bribeItem: "4 Polvos Somníferos"
         },
         {
           name: "Flan Amarillo",
           required: 10,
           captured: 0,
-          completed: false
+          completed: false,
+          bribeAmount: "7,500 Gil",
+          bribeItem: "3 Piedras Rayo"
         },
         {
           name: "Ragora",
           required: 10,
           captured: 0,
-          completed: false
+          completed: false,
+          bribeAmount: "4,800 Gil",
+          bribeItem: "2 Escama de Pez"
         }
       ],
-      soborno: "2,500 Gil",
-      objetoSoborno: "4 Polvos Somníferos",
       areaCompleted: false,
       expanded: false
     }
@@ -129,8 +139,14 @@ const MonsterArenaScreen = () => {
       <View style={styles.monsterInfo}>
         <Text style={styles.monsterName}>{monster.name}</Text>
         <Text style={styles.monsterProgress}>
-          {monster.captured}/{monster.required}
+          Capturados: {monster.captured}/{monster.required}
         </Text>
+        <View style={styles.bribeInfo}>
+          <Ionicons name="cash-outline" size={12} color={colors.gold} />
+          <Text style={styles.bribeText}>
+            {monster.bribeAmount} → {monster.bribeItem}
+          </Text>
+        </View>
       </View>
       
       <View style={styles.monsterControls}>
@@ -177,7 +193,10 @@ const MonsterArenaScreen = () => {
             <Text style={[styles.areaTitle, area.areaCompleted && styles.completedText]}>
               {area.zona}
             </Text>
-            <Text style={styles.areaObjective}>{area.objetivo}</Text>
+            <View style={styles.areaRewardContainer}>
+              <Ionicons name="trophy-outline" size={16} color={colors.gold} />
+              <Text style={styles.areaReward}>Recompensa: {area.objetivoZona}</Text>
+            </View>
             <Text style={styles.areaProgress}>
               {progress.captured}/{progress.total} monstruos capturados
             </Text>
@@ -209,6 +228,7 @@ const MonsterArenaScreen = () => {
           <View style={styles.areaContent}>
             {/* Monster List */}
             <View style={styles.monstersContainer}>
+              <Text style={styles.sectionTitle}>Monstruos a Capturar:</Text>
               {area.monsters.map((monster, index) => (
                 <MonsterRow
                   key={index}
@@ -219,18 +239,18 @@ const MonsterArenaScreen = () => {
               ))}
             </View>
             
-            {/* Reward Info */}
-            <View style={styles.rewardContainer}>
-              <Text style={styles.rewardTitle}>Recompensas:</Text>
-              <View style={styles.rewardRow}>
-                <Ionicons name="gift-outline" size={16} color={colors.gold} />
-                <Text style={styles.rewardText}>Soborno: {area.soborno}</Text>
+            {/* Area Completion Reward */}
+            {area.areaCompleted && (
+              <View style={styles.completionRewardContainer}>
+                <View style={styles.completionHeader}>
+                  <Ionicons name="trophy" size={20} color={colors.gold} />
+                  <Text style={styles.completionTitle}>¡Área Completada!</Text>
+                </View>
+                <Text style={styles.completionText}>
+                  Ve al Monster Arena para recibir: {area.objetivoZona}
+                </Text>
               </View>
-              <View style={styles.rewardRow}>
-                <Ionicons name="cube-outline" size={16} color={colors.gold} />
-                <Text style={styles.rewardText}>Objeto: {area.objetoSoborno}</Text>
-              </View>
-            </View>
+            )}
           </View>
         )}
       </View>
@@ -246,6 +266,7 @@ const MonsterArenaScreen = () => {
   }, { captured: 0, total: 0 });
 
   const completedAreas = areasData.filter(area => area.areaCompleted).length;
+  const totalAreas = areasData.length;
 
   return (
     <View style={styles.container}>
@@ -254,18 +275,27 @@ const MonsterArenaScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <TouchableOpacity style={styles.backButton}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
             <Ionicons name="arrow-back" size={24} color={colors.gold} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Monster Arena</Text>
-          <TouchableOpacity style={styles.infoButton}>
+          <TouchableOpacity 
+            style={styles.infoButton}
+            onPress={() => Alert.alert(
+              'Monster Arena',
+              'Captura monstruos para desbloquear recompensas.\n\n💰 Cada monstruo muestra su información de soborno debajo del contador.'
+            )}
+          >
             <Ionicons name="information-circle-outline" size={24} color={colors.gold} />
           </TouchableOpacity>
         </View>
         
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{completedAreas}</Text>
+            <Text style={styles.statNumber}>{completedAreas}/{totalAreas}</Text>
             <Text style={styles.statLabel}>Áreas Completadas</Text>
           </View>
           <View style={styles.statItem}>
@@ -281,6 +311,12 @@ const MonsterArenaScreen = () => {
 
       {/* Areas List */}
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.instructionsContainer}>
+          <Text style={styles.instructionsText}>
+            💡 Toca las áreas para expandir y ver los monstruos. Usa los botones +/- para contar capturas.
+          </Text>
+        </View>
+
         {areasData.map(area => (
           <AreaCard key={area.id} area={area} />
         ))}
@@ -351,6 +387,17 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  instructionsContainer: {
+    backgroundColor: colors.accent,
+    margin: 16,
+    padding: 12,
+    borderRadius: 8,
+  },
+  instructionsText: {
+    fontSize: 14,
+    color: colors.white,
+    textAlign: 'center',
+  },
   areaCard: {
     backgroundColor: colors.cardBackground,
     margin: 16,
@@ -382,20 +429,25 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.gold,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   completedText: {
     color: colors.successGreen,
   },
-  areaObjective: {
+  areaRewardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  areaReward: {
     fontSize: 14,
     color: colors.lightBlue,
-    marginBottom: 4,
+    marginLeft: 6,
+    fontStyle: 'italic',
   },
   areaProgress: {
     fontSize: 12,
     color: colors.lightBlue,
-    fontStyle: 'italic',
   },
   trophyIcon: {
     marginRight: 8,
@@ -429,13 +481,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.gold,
+    marginBottom: 12,
+  },
   monstersContainer: {
     marginBottom: 16,
   },
   monsterRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
     backgroundColor: colors.accent,
     borderRadius: 8,
@@ -448,6 +506,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.white,
     fontWeight: '500',
+    marginBottom: 2,
+  },
+  bribeInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  bribeText: {
+    fontSize: 11,
+    color: colors.gold,
+    marginLeft: 4,
+    fontStyle: 'italic',
   },
   monsterProgress: {
     fontSize: 12,
@@ -483,26 +553,26 @@ const styles = StyleSheet.create({
   completedBadge: {
     marginLeft: 8,
   },
-  rewardContainer: {
-    backgroundColor: colors.darkBlue,
+  completionRewardContainer: {
+    backgroundColor: colors.successGreen,
     borderRadius: 8,
     padding: 12,
+    marginTop: 8,
   },
-  rewardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.gold,
-    marginBottom: 8,
-  },
-  rewardRow: {
+  completionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
-  rewardText: {
-    fontSize: 14,
-    color: colors.lightBlue,
+  completionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.white,
     marginLeft: 8,
+  },
+  completionText: {
+    fontSize: 14,
+    color: colors.white,
   },
   bottomPadding: {
     height: 20,
