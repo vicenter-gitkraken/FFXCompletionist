@@ -1,4 +1,6 @@
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import {
   StyleSheet,
   Text,
@@ -10,9 +12,19 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function App() {
+// Import your MonsterArenaScreen component here
+// import MonsterArenaScreen from './screens/MonsterArenaScreen';
+
+const Stack = createStackNavigator();
+
+// Your original home screen component
+function HomeScreen({ navigation }) {
   const showComingSoon = (section) => {
     Alert.alert('Coming Soon!', `${section} section will be available soon.`);
+  };
+
+  const navigateToMonsterArena = () => {
+    navigation.navigate('MonsterArena');
   };
 
   const CategoryCard = ({ title, count, total, iconName, onPress }) => (
@@ -86,11 +98,11 @@ export default function App() {
 
           <View style={styles.categoryRow}>
             <CategoryCard
-              title="Monsters"
+              title="Monster Arena"
               count={87}
               total={142}
               iconName="paw-outline"
-              onPress={() => showComingSoon('Monster Arena')}
+              onPress={navigateToMonsterArena}
             />
             <CategoryCard
               title="Celestial"
@@ -146,6 +158,56 @@ export default function App() {
   );
 }
 
+// Temporary MonsterArena screen for demo - replace with the full component
+function MonsterArenaScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.darkBlue} />
+      
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color={colors.gold} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Monster Arena</Text>
+          <View style={{ width: 32 }} />
+        </View>
+      </View>
+      
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.tempContent}>
+          <Text style={styles.tempText}>
+            This is where your full Monster Arena screen will go!
+          </Text>
+          <Text style={styles.tempSubText}>
+            Replace this component with the MonsterArenaScreen from the previous artifact.
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator 
+        initialRouteName="Home"
+        screenOptions={{
+          headerShown: false,
+          cardStyle: { backgroundColor: colors.darkBlue }
+        }}
+      >
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="MonsterArena" component={MonsterArenaScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
 const colors = {
   darkBlue: '#1a237e',
   gold: '#ffd700',
@@ -168,6 +230,21 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 30,
     paddingHorizontal: 16,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.gold,
+  },
+  backButton: {
+    padding: 4,
   },
   logoContainer: {
     marginBottom: 16,
@@ -292,5 +369,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  tempContent: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 400,
+  },
+  tempText: {
+    fontSize: 18,
+    color: colors.gold,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  tempSubText: {
+    fontSize: 14,
+    color: colors.lightBlue,
+    textAlign: 'center',
   },
 });
