@@ -37,22 +37,7 @@ function HomeScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  const ProgressBar = ({ progress, max }) => (
-    <View style={styles.progressBarContainer}>
-      <View style={styles.progressBarBackground}>
-        <View 
-          style={[
-            styles.progressBarFill, 
-            { width: `${(progress / max) * 100}%` }
-          ]} 
-        />
-      </View>
-    </View>
-  );
 
-  const completedItems = 156;
-  const totalItems = 485;
-  const overallProgress = Math.round((completedItems / totalItems) * 100);
 
   return (
     <View style={styles.container}>
@@ -68,14 +53,7 @@ function HomeScreen({ navigation }) {
           <Text style={styles.subtitle}>Track your journey through Spira</Text>
         </View>
 
-        {/* Progress Overview */}
-        <View style={styles.progressCard}>
-          <Text style={styles.progressTitle}>Overall Progress</Text>
-          <ProgressBar progress={completedItems} max={totalItems} />
-          <Text style={styles.progressText}>
-            {overallProgress}% Complete ({completedItems}/{totalItems} items)
-          </Text>
-        </View>
+
 
         {/* Categories Grid */}
         <View style={styles.categoriesContainer}>
